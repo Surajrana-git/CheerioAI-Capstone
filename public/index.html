@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CheerioAI – Enterprise Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="login-split-body">
+  
+  <div class="split-left">
+    <div class="orbs-container">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="split-branding">
+      <div style="display: flex; gap: 15px; margin-bottom: 30px; align-items: center;">
+        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Indian_Institute_of_Technology%2C_Patna.svg/1280px-Indian_Institute_of_Technology%2C_Patna.svg.png" 
+             alt="IIT Patna Logo" 
+             style="height: 60px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));" />
+        <div class="brand-logo" style="margin: 0;">Cheerio <span>AI</span></div>
+      </div>
+      <h1>Intelligent routing.<br>Unmatched delivery.</h1>
+      <p>The enterprise infrastructure for modern, multi-channel customer engagement.</p>
+      
+      <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-2);">
+          CAPSTONE PROJECT
+        </p>
+        <p style="font-size: 14px; font-weight: 500; color: #cbd5e1; margin-top: 5px;">
+          IIT PATNA – GROUP NO. 63
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-right">
+    <div class="form-container">
+      <h2>Welcome Back</h2>
+      <p class="login-subtitle">Sign in to the Admin Console</p>
+
+      <form id="loginForm">
+        <label>
+          Email address
+          <input type="email" id="loginEmail" placeholder="admin@cheerio.tech" required />
+        </label>
+        <label>
+          Password
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </label>
+        <div id="loginError" class="error-msg"></div>
+        <button type="submit" class="primary-btn wide" style="margin-top: 10px; padding: 14px;">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

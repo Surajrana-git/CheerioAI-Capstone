@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CheerioAI Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const role = localStorage.getItem("role");
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (!loggedIn || role !== "admin") {
+      window.location.href = "index.html";
+    }
+  </script>
+</head>
+<body class="dashboard-body">
+  <aside class="sidebar">
+    <div class="logo">Cheerio <span>AI</span></div>
+<nav class="menu">
+  <a class="active" data-section="dashboard">Dashboard</a>
+  <a data-section="campaigns">Campaigns</a>
+  <a data-section="contacts">Contacts</a>
+  <a data-section="analytics">Analytics</a>
+  <a data-section="templates">Templates</a>
+  <a data-section="api">API & Integration</a>
+</nav>
+
+    <div class="quick-actions">
+  <button id="newCampaignBtn" class="primary-btn">New Campaign</button>
+  <button id="scheduleBtn" class="primary-btn">Schedule Message</button>
+</div>
+
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="hamburgerMenu" class="hamburger">☰</button>
+        <div class="top-title">Dashboard Overview</div>
+        <div class="top-subtitle">
+          Monitor your multi-channel broadcasting performance
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button
+          id="themeToggle"
+          class="icon-btn"
+          title="Toggle dark mode"
+        >
+          🌙
+        </button>
+
+        <button id="logoutBtn" class="secondary-btn small">Logout</button>
+
+        <div class="profile">
+          <div class="avatar">A</div>
+          <div>
+            <strong>Admin User</strong><br />
+            <small>admin@cheerio.tech</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="section-dashboard" class="section active">
+      <section class="stats-grid">
+      <article class="card stat-card">
+        <div class="stat-icon">📨</div>
+        <div class="stat-label">Messages Sent</div>
+        <div class="stat-value" id="messageCount">1,245,890</div>
+      <div class="stat-change positive">+12.5%</div>
+      </article>
+
+      <article class="card stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Active Contacts</div>
+        <div class="stat-value" id="activeContacts">-</div>
+        <div class="stat-change positive">--</div>
+      </article>
+
+      <article class="card stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Delivery Rate</div>
+        <div class="stat-value" id="deliveryRate">-</div>
+        <div class="stat-change positive">--</div>
+      </article>
+
+      <article class="card stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-label">Pending Campaigns</div>
+        <div class="stat-value" id="pendingCampaigns">-</div>
+        <div class="stat-change negative">--</div>
+      </article>
+    </section>
+
+    <section class="grid-2">
+
+      <article class="card chart-card">
+        <div class="card-header">
+          <div>
+            <h2>Campaign Performance</h2>
+            <p>Last 6 months trend analysis</p>
+          </div>
+          <a href="#" class="link">View Details</a>
+        </div>
+
+        <div class="chart-wrapper">
+          <canvas id="performanceChart"></canvas>
+        </div>
+      </article>
+
+  
+      <article class="card chart-card">
+        <div class="card-header">
+          <div>
+            <h2>Channel Distribution</h2>
+            <p>Usage by platform</p>
+          </div>
+        </div>
+
+        <div class="chart-wrapper">
+          <canvas id="channelChart"></canvas>
+        </div>
+
+        <ul class="channel-legend">
+          <li><span class="dot email"></span>Email <span class="percent">45%</span></li>
+          <li><span class="dot sms"></span>SMS <span class="percent">25%</span></li>
+          <li><span class="dot wa"></span>WhatsApp <span class="percent">20%</span></li>
+          <li><span class="dot push"></span>Push <span class="percent">7%</span></li>
+          <li><span class="dot social"></span>Social <span class="percent">3%</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="card">
+        <h2>Send a New Message</h2>
+        <p>Broadcast across multiple channels</p>
+
+        <textarea
+          id="messageInput"
+          maxlength="200"
+          placeholder="Type your message..."
+        ></textarea>
+        <div class="counter">
+          <span id="charCount">0</span>/200
+        </div>
+
+        <h3>Select Channels</h3>
+        <div class="channels">
+          <label><input type="checkbox" value="Email" /> Email</label>
+          <label><input type="checkbox" value="SMS" /> SMS</label>
+          <label><input type="checkbox" value="WhatsApp" /> WhatsApp</label>
+        </div>
+
+        <button id="sendBtn" class="primary-btn wide">Send Message</button>
+      </article>
+
+      
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <h2>Recent Campaigns</h2>
+            <p>Your latest broadcasting activities</p>
+          </div>
+          <button class="primary-btn small" onclick="document.getElementById('campaignModal').style.display='flex'">New Campaign</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="campaign-table">
+            <thead>
+              <tr>
+                <th>Campaign Name</th>
+                <th>Channel</th>
+                <th>Messages Sent</th>
+                <th>Delivered</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="campaignTableBody">
+              <!-- Dynamically populated by backend -->
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    
+    <section class="card">
+      <h2>Message Logs</h2>
+      <div id="logContainer" class="log-container"></div>
+    </section>
+      </section> <!-- end dashboard section -->
+
+      <section id="section-campaigns" class="section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>All Campaigns</h2>
+              <p>Manage and filter your broadcasting campaigns</p>
+            </div>
+            <button id="exportCampaignsBtn" class="primary-btn small">Export Report</button>
+          </div>
+          <div style="margin-top: 16px; padding: 12px; background: var(--bg-soft); border-radius: 8px;">
+            <p><strong>Upcoming Features:</strong> Advanced Filtering, Drafts, and Campaign Duplication.</p>
+          </div>
+          <div class="table-wrapper" style="margin-top:20px; max-height: 400px;">
+            <table class="campaign-table">
+              <thead>
+                <tr>
+                  <th>Campaign Name</th>
+                  <th>Channel</th>
+                  <th>Messages Sent</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="allCampaignsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-contacts" class="section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Contact Management</h2>
+              <p>View and manage all your active contacts</p>
+            </div>
+            <div>
+              <input type="file" id="csvFileInput" accept=".csv" style="display:none;" />
+              <button id="importContactsBtn" class="primary-btn small">Import CSV</button>
+            </div>
+          </div>
+          <div class="table-wrapper" style="margin-top:20px; max-height: 400px;">
+            <table class="campaign-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Tags</th>
+                  <th>Engagement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Sarah Jenkins</td><td>sarah.j@example.com</td><td>+1 (555) 123-4567</td><td><span class="badge info">VIP</span></td><td>High (98%)</td></tr>
+                <tr><td>Michael Chen</td><td>m.chen@domain.co</td><td>+1 (555) 987-6543</td><td><span class="badge success">New</span></td><td>Medium (65%)</td></tr>
+                <tr><td>Elena Rossi</td><td>elena.r@studio.net</td><td>+39 333 1234567</td><td><span class="badge info">Europe</span></td><td>High (89%)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-analytics" class="section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Advanced Analytics</h2>
+              <p>Deep insights into your broadcast performance</p>
+            </div>
+            <select id="analyticsTimeframe" class="secondary-btn">
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+              <option value="1y">Last Year</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px;">
+            <div class="chart-wrapper" style="height: 300px; background: var(--bg-soft); padding: 10px; border-radius: 8px;">
+              <h3 style="margin-bottom: 10px; font-size: 14px; color: var(--text-muted); text-align: center;">Engagement Trends</h3>
+              <canvas id="advancedLineChart"></canvas>
+            </div>
+            <div class="chart-wrapper" style="height: 300px; background: var(--bg-soft); padding: 10px; border-radius: 8px;">
+              <h3 style="margin-bottom: 10px; font-size: 14px; color: var(--text-muted); text-align: center;">Delivery by Platform</h3>
+              <canvas id="advancedDoughnutChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="section-templates" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2>Message Templates</h2>
+            <button class="primary-btn small">Create Template</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top:20px;">
+            <div style="padding:16px; border:1px solid #e5e7eb; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between;"><strong>Welcome Series</strong> <span class="badge success">Active</span></div>
+              <p style="color:var(--text-muted); font-size:13px; margin:10px 0;">Hi {{name}}! Welcome to the family. Enjoy 10% off your first order!</p>
+              <button class="secondary-btn small wide">Use Template</button>
+            </div>
+            <div style="padding:16px; border:1px solid #e5e7eb; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between;"><strong>Cart Abandonment</strong> <span class="badge info">Draft</span></div>
+              <p style="color:var(--text-muted); font-size:13px; margin:10px 0;">Did you forget something, {{name}}? Your items are waiting over here...</p>
+              <button class="secondary-btn small wide">Use Template</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-api" class="section">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
+            <div>
+              <h2 style="display: flex; align-items: center; gap: 8px;">⚙️ Developer Console <span class="badge success" style="font-size: 11px;">v2.1 API Active</span></h2>
+              <p>Manage API keys, webhooks, and monitor your infrastructure traffic.</p>
+            </div>
+            <button class="primary-btn small">View Documentation</button>
+          </div>
+
+          <!-- API Keys -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px;">API Credentials</h3>
+            <div style="background: var(--bg-soft); padding: 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
+              <div style="flex: 1;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Production API Key</label>
+                <div style="font-family: monospace; font-size: 16px; letter-spacing: 1px; color: var(--accent);">
+                  sk_live_9a8b********************3g2h1
+                </div>
+              </div>
+              <button class="secondary-btn small" onclick="showToast('API Key copied to clipboard!', 'success')">Copy</button>
+              <button class="secondary-btn small" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">Revoke</button>
+            </div>
+          </div>
+
+          <!-- Usage Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 15px;">
+              <h4 style="margin-bottom: 5px;">API Requests (Last 24h)</h4>
+              <div style="display: flex; align-items: end; gap: 10px;">
+                <h2 style="font-size: 32px; color: var(--text-main); margin: 0;">142,890</h2>
+                <span class="badge info" style="margin-bottom: 8px;">+14% trend</span>
+              </div>
+              <div style="height: 60px; margin-top: 15px; display:flex; align-items:end; gap:4px; opacity: 0.8;">
+                <div style="flex:1; height: 40%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 60%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 30%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 80%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 50%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 90%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 100%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 60%; background:var(--accent); border-radius:2px;"></div>
+                <div style="flex:1; height: 40%; background:var(--accent); border-radius:2px;"></div>
+              </div>
+            </div>
+            
+            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 15px;">
+              <h4 style="margin-bottom: 10px;">Quick Integration</h4>
+              <pre style="background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 6px; font-size: 11px; overflow-x: auto; margin:0; line-height: 1.4;">
+curl -X POST https://api.cheerio.tech/v1/broadcast \
+  -H "Authorization: Bearer sk_live_***" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "campaign": "Welcome Series",
+    "channels": ["sms", "email"]
+  }'</pre>
+            </div>
+          </div>
+
+          <!-- Webhooks -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h3>Configured Webhooks</h3>
+              <button class="secondary-btn small">+ Add Endpoint</button>
+            </div>
+            <div class="table-wrapper">
+              <table class="campaign-table" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th>Endpoint URL</th>
+                    <th>Events</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-family: monospace; font-size: 13px;">https://crm.company.com/cheerio</td>
+                    <td><span class="badge info">message.delivered</span></td>
+                    <td><span class="badge success">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-family: monospace; font-size: 13px;">https://data.company.com/ingest</td>
+                    <td><span class="badge info">campaign.completed</span></td>
+                    <td><span class="badge success">Healthy</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+  </main>
+
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <h3>Logout?</h3>
+      <p>This will end your admin session.</p>
+
+      <div class="modal-buttons">
+        <button id="logoutConfirm" class="primary-btn">Logout</button>
+        <button id="logoutCancel" class="secondary-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<div id="campaignModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close-icon" aria-label="Close">&times;</button>
+    <h3>New Campaign</h3>
+    <input type="text" placeholder="Campaign Name">
+    <button id="aiDraftBtn" class="secondary-btn" style="margin-bottom:10px; width:100%;"><span style="margin-right:8px;">✨</span> AI Auto-Draft</button>
+    <div id="aiPromptContainer" style="display:none; margin-bottom:10px; padding:10px; background:var(--bg-soft); border-radius:8px;">
+      <input type="text" id="aiPromptInput" placeholder="e.g. Write a 50% off summer shoe sale sms" style="margin-bottom:8px;">
+      <button id="generateAiMsgBtn" class="primary-btn small wide">Generate</button>
+    </div>
+    <textarea id="campaignModalMessage" placeholder="Message"></textarea>
+    <button class="modal-close primary-btn">Create</button>
+  </div>
+</div>
+
+<div id="scheduleModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close-icon" aria-label="Close">&times;</button>
+    <h3>Schedule Message</h3>
+    <input type="datetime-local">
+    <textarea placeholder="Message"></textarea>
+    <button class="modal-close primary-btn">Schedule</button>
+  </div>
+</div>
+
+<div id="editCampaignModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close-icon" aria-label="Close">&times;</button>
+    <h3>Edit Campaign</h3>
+    <input type="hidden" id="editCampaignId">
+    <input type="text" id="editCampaignName" placeholder="Campaign Name">
+    <select id="editCampaignStatus" style="width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db;">
+      <option value="scheduled">Scheduled</option>
+      <option value="in-progress">In-Progress</option>
+      <option value="completed">Completed</option>
+    </select>
+    <button id="saveCampaignBtn" class="primary-btn wide">Save Changes</button>
+  </div>
+</div>
+
+<div id="reportModal" class="modal">
+  <div class="modal-content" style="width: 450px;">
+    <button class="modal-close-icon" aria-label="Close">&times;</button>
+    <h3 id="reportCampaignTitle">Campaign Report</h3>
+    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+       <div style="text-align: center;">
+         <h2 id="reportSent" style="color: var(--accent);">0</h2>
+         <small>Sent</small>
+       </div>
+       <div style="text-align: center;">
+         <h2 id="reportDelivered" style="color: #10b981;">0</h2>
+         <small>Delivered</small>
+       </div>
+       <div style="text-align: center;">
+         <h2 id="reportRate">0%</h2>
+         <small>Rate</small>
+       </div>
+    </div>
+    <div class="chart-wrapper" style="height: 200px;">
+       <canvas id="reportChart"></canvas>
+    </div>
+  </div>
+</div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="script.js"></script>
+</body>
+</html>
