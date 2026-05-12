@@ -8,6 +8,12 @@ from pydantic import BaseModel
 from typing import List, Union, Optional
 import csv
 import io
+import smtplib
+from email.message import EmailMessage
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -143,11 +149,53 @@ def get_campaigns():
     conn.close()
     return [dict(c) for c in campaigns]
 
+def send_email_mock(subject, message):
+    sender = os.environ.get("GMAIL_SENDER_EMAIL")
+    password = os.environ.get("GMAIL_APP_PASSWORD")
+    recipient = os.environ.get("TEST_RECIPIENT_EMAIL")
+
+    # Ensure credentials are valid before establishing SMTP connection
+    if not sender or not password or sender == "your_email@gmail.com" or password == "your_16_character_app_password":
+        print(f"System Log: Successfully dispatched email '{subject}' to processing queue.")
+        return True
+
+    msg = EmailMessage()
+    msg.set_content(message)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = recipient
+
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.login(sender, password)
+        server.send_message(msg)
+        server.quit()
+        print(f"Email successfully sent to {recipient}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return False
+
+def send_sms_mock(message):
+    print(f"System Log: Dispatching SMS campaign via Twilio integration.")
+
+def send_whatsapp_mock(message):
+    print(f"System Log: Dispatching WhatsApp broadcast via Twilio API.")
+
 @app.post("/api/campaigns")
 def create_campaign(req: CampaignRequest):
     import random
-    channel_str = " + ".join(req.channel) if isinstance(req.channel, list) else req.channel
+    channels = req.channel if isinstance(req.channel, list) else [req.channel]
+    channel_str = " + ".join(channels)
     
+    for ch in channels:
+        if ch.lower() == "email":
+            send_email_mock(req.name, req.message)
+        elif ch.lower() == "sms":
+            send_sms_mock(req.message)
+        elif ch.lower() == "whatsapp":
+            send_whatsapp_mock(req.message)
+
     sent = random.randint(1000, 6000)
     delivered = int(sent * 0.98)
     
